@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AgriTrack</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                        url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: rgba(46, 125, 50, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: fadeInDown 0.5s ease-out;
+        }
+
+        h2 {
+            color: #1b5e20;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+            font-size: 1.8em;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .form-group {
+            margin: 20px 0;
+            position: relative;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 15px;
+            margin: 8px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 8px rgba(76,175,80,0.3);
+            transform: translateY(-2px);
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: #45a049;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(76,175,80,0.3);
+        }
+
+        .summary-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .summary-card h3 {
+            color: #1b5e20;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .summary-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .graph-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .graph-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .graph-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        tr:hover {
+            background-color: rgba(76,175,80,0.1);
+            transform: scale(1.01);
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            padding: 8px 15px;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+
+        .amount {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .expense {
+            color: #dc3545;
+        }
+
+        .income {
+            color: #28a745;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4CAF50;
+        }
+
+        .section-title i {
+            margin-right: 15px;
+            color: #4CAF50;
+            font-size: 28px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2em;
+                padding: 15px;
+            }
+
+            .graph-section {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+
+        .filter-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 8px 15px;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            background: white;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:hover {
+            background: #f5f5f5;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(76,175,80,0.3);
+        }
+
+        .filter-label {
+            font-weight: bold;
+            color: #1b5e20;
+        }
+
+        .filter-button {
+            background: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-button:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+
+        .filter-button.active {
+            background: #2e7d32;
+        }
+
+        .reminder-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            backdrop-filter: blur(5px);
+        }
+
+        .reminder-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .reminder-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .reminder-input:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(76,175,80,0.3);
+        }
+
+        .reminder-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .reminder-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .reminder-item:hover {
+            transform: translateX(5px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .reminder-text {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .reminder-date {
+            color: #666;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+
+        .reminder-delete {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .reminder-delete:hover {
+            transform: scale(1.2);
+        }
+
+        .reminder-empty {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AgriTrack</h1>
+        
+        <div class="summary-section">
+            <div class="summary-card">
+                <div class="section-title">
+                    <i class="material-icons">trending_up</i>
+                    <h3>Total Income</h3>
+                </div>
+                <div class="value income" id="totalIncome">$0.00</div>
+            </div>
+            <div class="summary-card">
+                <div class="section-title">
+                    <i class="material-icons">trending_down</i>
+                    <h3>Total Expenses</h3>
+                </div>
+                <div class="value expense" id="totalExpenses">$0.00</div>
+            </div>
+            <div class="summary-card">
+                <div class="section-title">
+                    <i class="material-icons">account_balance</i>
+                    <h3>Net Margin</h3>
+                </div>
+                <div class="value" id="netMargin">$0.00</div>
+            </div>
+        </div>
+
+        <div class="reminder-section">
+            <div class="section-title">
+                <i class="material-icons">notifications</i>
+                <h2>Reminder Notes</h2>
+            </div>
+            <form id="reminderForm" class="reminder-form">
+                <input type="text" id="reminderInput" class="reminder-input" placeholder="Add a reminder note..." required>
+                <button type="submit" class="filter-button">Add Reminder</button>
+            </form>
+            <ul id="reminderList" class="reminder-list">
+                <!-- Reminders will be added here -->
+            </ul>
+        </div>
+
+        <div class="filter-section">
+            <div class="filter-controls">
+                <span class="filter-label">Filter by:</span>
+                <select id="monthFilter" class="filter-select">
+                    <option value="all">All Data</option>
+                    <option value="current">Current Month</option>
+                    <option value="last">Last Month</option>
+                    <option value="custom">Custom Month</option>
+                </select>
+                <div id="customMonthContainer" style="display: none;">
+                    <input type="month" id="customMonth" class="filter-select">
+                </div>
+            </div>
+            <button id="applyFilter" class="filter-button">Apply Filter</button>
+        </div>
+
+        <div class="graph-section">
+            <div class="graph-card">
+                <div class="section-title">
+                    <i class="material-icons">bar_chart</i>
+                    <h3>Monthly Overview</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+            <div class="graph-card">
+                <div class="section-title">
+                    <i class="material-icons">pie_chart</i>
+                    <h3>Category Distribution</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-title">
+                <i class="material-icons">add_circle</i>
+                <h2>Add Transaction</h2>
+            </div>
+            <form id="transactionForm">
+                <div class="form-group">
+                    <select id="type" required>
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="amount" placeholder="Amount" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="category" placeholder="Category" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="description" placeholder="Description" required>
+                </div>
+                <div class="form-group date-section">
+                    <div class="date-input">
+                        <input type="date" id="date" required>
+                    </div>
+                </div>
+                <button type="submit">Add Transaction</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="section-title">
+                <i class="material-icons">receipt_long</i>
+                <h2>Transactions</h2>
+            </div>
+            <table id="transactionsTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+
+        // Set default date to today
+        document.getElementById('date').valueAsDate = new Date();
+
+        // Update summary
+        function updateSummary(transactions) {
+            const summary = transactions.reduce((acc, t) => {
+                if (t.type === 'income') {
+                    acc.income += parseFloat(t.amount);
+                } else {
+                    acc.expenses += parseFloat(t.amount);
+                }
+                return acc;
+            }, { income: 0, expenses: 0 });
+
+            const netMargin = summary.income - summary.expenses;
+
+            document.getElementById('totalIncome').textContent = `$${summary.income.toFixed(2)}`;
+            document.getElementById('totalExpenses').textContent = `$${summary.expenses.toFixed(2)}`;
+            document.getElementById('netMargin').textContent = `$${netMargin.toFixed(2)}`;
+            document.getElementById('netMargin').className = `value ${netMargin >= 0 ? 'income' : 'expense'}`;
+        }
+
+        // Initialize charts
+        let monthlyChart = null;
+        let categoryChart = null;
+
+        function initializeCharts() {
+            // Monthly Overview Chart
+            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+            monthlyChart = new Chart(monthlyCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Income',
+                            backgroundColor: '#28a745',
+                            data: []
+                        },
+                        {
+                            label: 'Expenses',
+                            backgroundColor: '#dc3545',
+                            data: []
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Category Distribution Chart
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            categoryChart = new Chart(categoryCtx, {
+                type: 'pie',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#4CAF50',
+                            '#45a049',
+                            '#2e7d32',
+                            '#1b5e20',
+                            '#388e3c'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function updateCharts(transactions) {
+            // Process data for monthly chart
+            const monthlyData = transactions.reduce((acc, t) => {
+                const date = new Date(t.date);
+                const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`;
+                
+                if (!acc[monthYear]) {
+                    acc[monthYear] = { income: 0, expenses: 0 };
+                }
+                
+                if (t.type === 'income') {
+                    acc[monthYear].income += parseFloat(t.amount);
+                } else {
+                    acc[monthYear].expenses += parseFloat(t.amount);
+                }
+                
+                return acc;
+            }, {});
+
+            // Process data for category chart
+            const categoryData = transactions.reduce((acc, t) => {
+                if (!acc[t.category]) {
+                    acc[t.category] = 0;
+                }
+                acc[t.category] += parseFloat(t.amount);
+                return acc;
+            }, {});
+
+            // Update monthly chart
+            monthlyChart.data.labels = Object.keys(monthlyData);
+            monthlyChart.data.datasets[0].data = Object.values(monthlyData).map(d => d.income);
+            monthlyChart.data.datasets[1].data = Object.values(monthlyData).map(d => d.expenses);
+            monthlyChart.update();
+
+            // Update category chart
+            categoryChart.data.labels = Object.keys(categoryData);
+            categoryChart.data.datasets[0].data = Object.values(categoryData);
+            categoryChart.update();
+        }
+
+        // Add filter functionality
+        let allTransactions = [];
+        let filteredTransactions = [];
+
+        document.getElementById('monthFilter').addEventListener('change', function(e) {
+            const customMonthContainer = document.getElementById('customMonthContainer');
+            if (e.target.value === 'custom') {
+                customMonthContainer.style.display = 'block';
+            } else {
+                customMonthContainer.style.display = 'none';
+            }
+        });
+
+        document.getElementById('applyFilter').addEventListener('click', function() {
+            const filterValue = document.getElementById('monthFilter').value;
+            const customMonth = document.getElementById('customMonth').value;
+            
+            let filteredData = [...allTransactions];
+            
+            if (filterValue !== 'all') {
+                const now = new Date();
+                let startDate, endDate;
+                
+                if (filterValue === 'current') {
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                } else if (filterValue === 'last') {
+                    startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), 0);
+                } else if (filterValue === 'custom' && customMonth) {
+                    const [year, month] = customMonth.split('-');
+                    startDate = new Date(year, month - 1, 1);
+                    endDate = new Date(year, month, 0);
+                }
+                
+                if (startDate && endDate) {
+                    filteredData = allTransactions.filter(t => {
+                        const transactionDate = new Date(t.date);
+                        return transactionDate >= startDate && transactionDate <= endDate;
+                    });
+                }
+            }
+            
+            filteredTransactions = filteredData;
+            updateUI(filteredData);
+        });
+
+        // Modify the loadTransactions function
+        async function loadTransactions() {
+            const response = await fetch(`${API_URL}/transactions`);
+            allTransactions = await response.json();
+            filteredTransactions = [...allTransactions];
+            updateUI(allTransactions);
+        }
+
+        // New function to update UI with filtered data
+        function updateUI(transactions) {
+            const tbody = document.querySelector('#transactionsTable tbody');
+            tbody.innerHTML = '';
+            
+            transactions.forEach(t => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(t.date).toLocaleDateString()}</td>
+                    <td class="${t.type}">${t.type}</td>
+                    <td>${t.category}</td>
+                    <td>${t.description}</td>
+                    <td class="amount ${t.type}">$${t.amount}</td>
+                    <td><button class="delete-btn" onclick="deleteTransaction(${t.id})">Delete</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            updateSummary(transactions);
+            updateCharts(transactions);
+        }
+
+        // Modify the delete transaction function
+        async function deleteTransaction(id) {
+            await fetch(`${API_URL}/transactions/${id}`, {
+                method: 'DELETE'
+            });
+            loadTransactions();
+        }
+
+        // Reminder functionality
+        let reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+
+        function saveReminders() {
+            localStorage.setItem('reminders', JSON.stringify(reminders));
+        }
+
+        function addReminder(text) {
+            const reminder = {
+                id: Date.now(),
+                text: text,
+                date: new Date().toISOString()
+            };
+            reminders.unshift(reminder);
+            saveReminders();
+            renderReminders();
+        }
+
+        function deleteReminder(id) {
+            reminders = reminders.filter(r => r.id !== id);
+            saveReminders();
+            renderReminders();
+        }
+
+        function renderReminders() {
+            const reminderList = document.getElementById('reminderList');
+            reminderList.innerHTML = '';
+
+            if (reminders.length === 0) {
+                reminderList.innerHTML = '<div class="reminder-empty">No reminders yet. Add one above!</div>';
+                return;
+            }
+
+            reminders.forEach(reminder => {
+                const li = document.createElement('li');
+                li.className = 'reminder-item';
+                li.innerHTML = `
+                    <div class="reminder-text">${reminder.text}</div>
+                    <div class="reminder-date">${new Date(reminder.date).toLocaleDateString()}</div>
+                    <button class="reminder-delete" onclick="deleteReminder(${reminder.id})">
+                        <i class="material-icons">delete</i>
+                    </button>
+                `;
+                reminderList.appendChild(li);
+            });
+        }
+
+        document.getElementById('reminderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const input = document.getElementById('reminderInput');
+            if (input.value.trim()) {
+                addReminder(input.value.trim());
+                input.value = '';
+            }
+        });
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeCharts();
+            loadTransactions();
+            renderReminders();
+        });
+    </script>
+</body>
+</html> 
